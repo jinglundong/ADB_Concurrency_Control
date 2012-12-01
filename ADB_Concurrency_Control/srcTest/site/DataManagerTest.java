@@ -32,7 +32,7 @@ public class DataManagerTest {
         Set<String> unique = new HashSet<String>();
         unique.add("x3");
         DataManager dm = new DataManager(data, unique);
-        assertEquals(dm.getReplicatedVariables().size(), 2);
+        assertEquals(dm.getReplicatedResource().size(), 2);
     }
 
 }
