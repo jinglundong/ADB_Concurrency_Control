@@ -58,6 +58,8 @@ public class Request {
         buffer.append(String.valueOf(this.requestType));
         buffer.append("\nvalue: ");
         buffer.append(this.value);
+        buffer.append("\nsite: ");
+        buffer.append(this.site);
         buffer.append("\n");
         return buffer.toString();        
     }
