@@ -2,7 +2,8 @@ package site;
 
 import java.util.Set;
 
-import Entity.Request;
+import entity.Request;
+
 
 
 public interface Site {

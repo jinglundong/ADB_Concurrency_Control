@@ -1,4 +1,4 @@
-package Entity;
+package entity;
 
 public enum RequestType {
     READ,
@@ -8,5 +8,8 @@ public enum RequestType {
     RECOVER,
     DUMP,
     COMMIT,
-    ABORT    
+    ABORT,
+    BEGIN,
+    BEGINRO,
+    END
 }

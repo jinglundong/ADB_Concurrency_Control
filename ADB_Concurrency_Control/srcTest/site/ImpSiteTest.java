@@ -9,10 +9,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
+import entity.Request;
+import entity.RequestType;
+
 import site.entity.LockType;
 
-import Entity.Request;
-import Entity.RequestType;
 
 public class ImpSiteTest {
 
@@ -105,22 +106,91 @@ public class ImpSiteTest {
         site.exeRequest(writeReqT1);
         assertEquals(site.checkConflict(readReqT1).size(), 0);
         assertEquals(site.checkConflict(writeReqT2).size(), 1);
-        
+        //read only read
+        String resource = "x4";
+        String transaction = "T3";
+        RequestType requestType = RequestType.ROREAD;
+        String value = "";      
+        site.getDataManager().createSnapshot("T3");
+        Request request = new Request(resource, transaction, requestType, value);
+        assertEquals(site.exeRequest(request), "40");
+        //dump x4
+        requestType = RequestType.DUMP;
+        request = new Request(resource, transaction, requestType, value);
+        assertEquals(site.exeRequest(request), "");        
     }
 
     @Test
     public void testFail() {
-        fail("Not yet implemented");
-    }
-
-    @Test
-    public void testIsRunning() {
-        fail("Not yet implemented");
+        assertTrue(site.isRunning());
+        site.fail();
+        assertTrue(!site.isRunning());        
     }
 
     @Test
     public void testGetSiteNum() {
-        fail("Not yet implemented");
+        assertEquals(site.getSiteNum(), 4);
     }
+        
 
+    @Test
+    public void testCase1(){
+        String resource = "x1";
+        String transaction = "T1";
+        RequestType requestType = RequestType.WRITE;
+        String value = "101";              
+        Request request = new Request(resource, transaction, requestType, value);
+        assertEquals(site.checkConflict(request).size(), 0);
+        site.exeRequest(request);
+        
+        resource = "x2";
+        transaction = "T2";
+        value = "202";
+        request = new Request(resource, transaction, requestType, value);
+        assertEquals(site.checkConflict(request).size(), 0);
+        site.exeRequest(request);
+        
+        resource = "x2";
+        transaction = "T1";
+        value = "102";
+        request = new Request(resource, transaction, requestType, value);
+        assertTrue(site.checkConflict(request).contains("T2"));
+    }
+    
+    @Test
+    public void testCase2(){
+        String resource = "x2";
+        String transaction = "T1";
+        RequestType requestType = RequestType.WRITE;
+        String value = "101";              
+        Request request = new Request(resource, transaction, requestType, value);
+        assertTrue(site.checkConflict(request).isEmpty());
+        site.exeRequest(request);
+        
+        site.getDataManager().createSnapshot("T2");
+        resource = "x4";
+        transaction = "T2";
+        requestType = RequestType.ROREAD;
+        request = new Request(resource, transaction, requestType, value);
+        assertTrue(site.checkConflict(request).isEmpty());
+        site.exeRequest(request);
+                
+        transaction = "T1";
+        requestType = RequestType.WRITE;
+        value = "102";
+        request = new Request(resource, transaction, requestType, value);
+        assertTrue(site.checkConflict(request).isEmpty());
+        site.exeRequest(request);
+        
+        resource = "x2";
+        transaction = "T2";
+        requestType = RequestType.ROREAD;
+        request = new Request(resource, transaction, requestType, value);
+        assertTrue(site.checkConflict(request).isEmpty());
+        site.exeRequest(request);
+                
+        assertEquals(site.getDataManager().getWriteLog().get("T1").get("x2"), "101");
+        assertEquals(site.getDataManager().getWriteLog().get("T1").get("x4"), "102");               
+    }
+    
 }

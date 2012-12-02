@@ -1,15 +1,15 @@
 package site;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import Entity.Request;
-import Entity.RequestType;
+import entity.Request;
+import entity.RequestType;
+
 
 import site.entity.LockType;
-
-
 
 /**
  * 
@@ -53,6 +53,8 @@ public class ImpSite implements Site{
         case WRITE:
             return lockManager.checkConflict(request.resource, 
                     request.transaction, LockType.WRITE);
+        case ROREAD:
+            return new HashSet<String>();
         default:
             throw new IllegalArgumentException("request type must be either read or write");
         }
@@ -65,10 +67,11 @@ public class ImpSite implements Site{
             throw new RuntimeException("access a down site");
         }     
         RequestType requestType = request.requestType;
+        String result = "";
         switch (requestType){
         case READ:
             lockManager.setLock(request.resource, request.transaction, LockType.READ);
-            dataManager.read(request.transaction, request.resource, false);
+            result = dataManager.read(request.transaction, request.resource, false);
             break;
         case WRITE:
             lockManager.setLock(request.resource, request.transaction, LockType.WRITE);
@@ -78,8 +81,7 @@ public class ImpSite implements Site{
             dataManager.write(request.transaction, request.resource, request.value);
             break;
         case ROREAD:    //read issued by a read only transaction
-            lockManager.setLock(request.resource, request.transaction, LockType.READ);
-            dataManager.read(request.transaction, request.resource, true);
+            result = dataManager.read(request.transaction, request.resource, true);
             break;
         case DUMP:
             if (request.resource == null || request.resource.isEmpty()){
@@ -93,18 +95,20 @@ public class ImpSite implements Site{
             if (request.transaction == null || request.transaction.isEmpty()){
                 throw new IllegalArgumentException("transaction is null");
             }
+            lockManager.removeLockByTransaction(request.transaction);
             dataManager.commit(request.transaction);
             break;
         case ABORT:
             if (request.transaction == null || request.transaction.isEmpty()){
                 throw new IllegalArgumentException("transaction is null");
             }
+            lockManager.removeLockByTransaction(request.transaction);
             dataManager.terminateTransaction(request.transaction);
             break;
         default:
             throw new IllegalArgumentException("request type not supported");
         }        
-        return "SUCCESS";        
+        return result;        
     }
 
     
