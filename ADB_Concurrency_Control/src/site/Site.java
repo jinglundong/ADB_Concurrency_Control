@@ -3,7 +3,6 @@ package site;
 import java.util.Set;
 
 import site.entity.Request;
-import entity.*;
 
 public interface Site {
     /**
@@ -28,7 +27,7 @@ public interface Site {
      * @return "SUCCESS" if the request is successfully processed. <br>
      * return error messages if there is error.
      */
-    public String tryRequest(Request request);
+    public String exeRequest(Request request);
     
     
     /**
@@ -36,4 +35,10 @@ public interface Site {
      */
     public void fail();
   
+    
+    /**
+     * Check site status
+     * @return return true if site is running
+     */
+    public boolean isRunning();
 }

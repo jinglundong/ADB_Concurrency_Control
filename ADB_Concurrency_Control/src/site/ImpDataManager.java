@@ -2,6 +2,7 @@ package site;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Set;
  * @author jinglun
  *
  */
-public class DataManager {   
+public class ImpDataManager {   
 
     //data in DB, <resource, value> i.e. <x3, 30>
     private HashMap<String, String> data;
@@ -34,7 +35,7 @@ public class DataManager {
      * @param data a HashMap of <variable, value> pairs
      * @param unique a set of resource name of unique variables
      */
-    public DataManager(HashMap<String, String> data, Set<String> unique){
+    public ImpDataManager(HashMap<String, String> data, Set<String> unique){
         this.data = data;     
         this.unique = unique;
         writeLog = new HashMap<String, HashMap<String, String>>();
@@ -206,6 +207,46 @@ public class DataManager {
             readLog.remove(transaction);
         }        
         return result;
+    }  
+    
+    
+    /**
+     * Dump all resources on this site
+     * @return
+     */
+    public String dumpSite(){
+        StringBuffer buffer = new StringBuffer();
+        for (Map.Entry<String, String> entry : data.entrySet()){
+            buffer.append(entry.getKey());
+            buffer.append(": ");
+            buffer.append(entry.getValue());
+            buffer.append(" ");
+        }
+        return buffer.toString();
     }
-
+    
+    
+    /**
+     * Dump value of given resource
+     * @param resource
+     * @return
+     */
+    public String dumpResource(String resource){
+        if (data.containsKey(resource)){
+            return resource + ": " + data.get(resource) + " "; 
+        }
+        else{
+            return resource + ": NULL ";
+        }
+    }
+    
+    
+    /**
+     * Check if requested resource is on this site
+     * @param resource
+     * @return
+     */
+    public boolean containsResource(String resource){
+        return data.containsKey(resource);
+    }
 }

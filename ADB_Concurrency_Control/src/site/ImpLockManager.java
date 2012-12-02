@@ -12,7 +12,7 @@ class ImpLockManager implements LockManager {
      * Map that maps "resource" to "lockEntity of the resource" <br>
      * Containing all lock information on the site.
      */
-    private Map<String, Locks> locksOfR;
+    private Map<String, ResourceLock> locksOfR;
 
     /**
      * Map that maps from "transaction" to "resources" that it have lock on it
@@ -22,7 +22,7 @@ class ImpLockManager implements LockManager {
     
     @Override
     public boolean isRecoverying(String resource){        
-        Locks thisLock = locksOfR.get(resource);
+        ResourceLock thisLock = locksOfR.get(resource);
         
         if(thisLock == null || thisLock.getType()!=LockType.RECOVERY)
             return false;
@@ -33,7 +33,7 @@ class ImpLockManager implements LockManager {
     public Set<String> checkConflict(String resource, String transaction,
             LockType requestType) {
 
-        Locks thisLock = locksOfR.get(resource);
+        ResourceLock thisLock = locksOfR.get(resource);
 
         // There is no lock on this resource.
         if (thisLock == null || thisLock.getType() == null)
@@ -77,7 +77,7 @@ class ImpLockManager implements LockManager {
             return;
         }
 
-        Locks thisLock = locksOfR.get(resource);
+        ResourceLock thisLock = locksOfR.get(resource);
 
         // Recovery Lock is handled by LockManager Here
         if (thisLock != null && thisLock.getType() == LockType.RECOVERY) {
@@ -92,7 +92,7 @@ class ImpLockManager implements LockManager {
 
         // There is no lock on this resource yet.
         if (thisLock == null) {
-            thisLock = new Locks(resource);
+            thisLock = new ResourceLock(resource);
             locksOfR.put(resource, thisLock);
         }
 
@@ -106,7 +106,7 @@ class ImpLockManager implements LockManager {
 
     @Override
     public boolean removeLock(String resource, String transaction) {
-        Locks rLock = locksOfR.get(resource);
+        ResourceLock rLock = locksOfR.get(resource);
         Set<String> tResources = this.resourcesOfT.get(transaction);
 
         if (rLock == null) {
@@ -153,7 +153,7 @@ class ImpLockManager implements LockManager {
 
     @Override
     public boolean removeLockByResource(String resource) {
-        Locks thisLock = locksOfR.get(resource);
+        ResourceLock thisLock = locksOfR.get(resource);
 
         // There is no lock on this resources
         if (thisLock == null)

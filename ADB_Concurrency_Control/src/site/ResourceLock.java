@@ -13,7 +13,7 @@ import site.entity.LockType;
  * @author Daoan XU
  * 
  */
-class Locks {
+class ResourceLock {
     /**
      * The type of the lock
      */
@@ -27,7 +27,7 @@ class Locks {
      * 
      * @param resource
      */
-    Locks(String resource) {
+    ResourceLock(String resource) {
         this.resource = resource;
         this.type = null;
         this.transactions = new HashSet<String>();

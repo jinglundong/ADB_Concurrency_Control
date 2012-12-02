@@ -4,23 +4,31 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import site.entity.LockType;
 import site.entity.Request;
+import site.entity.RequestType;
 
 
+
+/**
+ * 
+ * @author jinglun
+ *
+ */
 public class ImpSite implements Site{
     
     private boolean isRunning;
     
-    private LockManager lockManager;
+    private ImpLockManager lockManager;
     
-    private DataManager dataManager;
+    private ImpDataManager dataManager;
     
     private int siteNum;
     
     public ImpSite(int siteNum, HashMap<String, String> data, Set<String> unique){      
         this.siteNum = siteNum;
-        lockManager = new LockManager();
-        dataManager = new DataManager(data, unique);
+        lockManager = new ImpLockManager();
+        dataManager = new ImpDataManager(data, unique);
     }
     
     private void initiateData(Map<String, String> data, Set<String> unique){
@@ -39,19 +47,56 @@ public class ImpSite implements Site{
     }
     
     @Override
-    public Set<String> checkConflict(Request request){
-        return null;
+    public Set<String> checkConflict(Request request){  
+        if (request.requestType != RequestType.READ 
+                && request.requestType != RequestType.WRITE){
+            throw new IllegalArgumentException("request type must be either read or write");
+        }
+        if (request.requestType == RequestType.READ){
+            return lockManager.checkConflict(request.resource, 
+                    request.transaction, LockType.READ);
+        }
+        else{   //Write
+            return lockManager.checkConflict(request.resource, 
+                    request.transaction, LockType.WRITE);
+        }
     }
 
     @Override
-    public String tryRequest(Request request) {
-        // TODO Auto-generated method stub
-        return null;
+    public String exeRequest(Request request) {
+        RequestType requestType = request.requestType;
+        switch (requestType){
+        case READ:
+            lockManager.setLock(request.resource, request.transaction, LockType.READ);
+            dataManager.read(request.transaction, request.resource, false);
+            break;
+        case WRITE:
+            lockManager.setLock(request.resource, request.transaction, LockType.WRITE);
+            if (request.value == null || request.value.isEmpty()){
+                throw new IllegalArgumentException("value to be written to database is null");
+            }
+            dataManager.write(request.transaction, request.resource, request.value);
+        case ROREAD:
+            lockManager.setLock(request.resource, request.transaction, LockType.READ);
+            dataManager.read(request.transaction, request.resource, true);
+            break;
+        case DUMP:
+            
+        case COMMIT:
+        case ABORT:
+        default:
+            throw new IllegalArgumentException("request type not supported");
+        }        
+        return "SUCCESS";        
     }
 
     @Override
     public void fail() {
-        // TODO Auto-generated method stub
+        this.isRunning = false;    
         
+    }
+    
+    public boolean isRunning(){
+        return this.isRunning;
     }
 }

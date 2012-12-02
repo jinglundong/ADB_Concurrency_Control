@@ -2,6 +2,7 @@ package site;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +18,7 @@ import org.junit.Test;
 public class DataManagerTest {
 
     HashMap<String, String> dataCommon;
-    DataManager dmCommon;
+    ImpDataManager dmCommon;
     
     @Before
     public void initialize(){
@@ -30,7 +31,7 @@ public class DataManagerTest {
         Set<String> unique = new HashSet<String>();
         unique.add("x3");
         unique.add("x13");
-        dmCommon = new DataManager(dataCommon, unique);
+        dmCommon = new ImpDataManager(dataCommon, unique);
     }
     
     @Test
@@ -41,7 +42,7 @@ public class DataManagerTest {
         data.put("x3", "30");
         Set<String> unique = new HashSet<String>();
         unique.add("x3");
-        DataManager dm = new DataManager(data, unique);
+        ImpDataManager dm = new ImpDataManager(data, unique);
         assertEquals(dm.getUnique().size(), 1);
         assertEquals(dm.getData().size(), 3);
     }
@@ -54,7 +55,7 @@ public class DataManagerTest {
         data.put("x3", "30");
         Set<String> unique = new HashSet<String>();
         unique.add("x3");
-        DataManager dm = new DataManager(data, unique);
+        ImpDataManager dm = new ImpDataManager(data, unique);
         assertEquals(dm.getReplicatedResource().size(), 2);
     }
 
@@ -134,4 +135,19 @@ public class DataManagerTest {
         assertEquals(dmCommon.read("T3", "x3", false), "30");
     }
 
+    @Test
+    public void testDump(){
+        assertEquals(dmCommon.dumpResource("x3"), "x3: 30 ");
+        assertEquals(dmCommon.dumpResource("x2"), "x2: 20 ");
+        dmCommon.write("T1", "x3", "40");
+        assertEquals(dmCommon.dumpResource("x3"), "x3: 30 ");
+        dmCommon.commit("T1");
+        assertEquals(dmCommon.dumpResource("x3"), "x3: 40 ");
+        assertEquals(dmCommon.dumpResource("x1"), "x1: NULL ");
+    }
+    
+    @Test
+    public void testDumpSite(){
+        assertEquals(Arrays.deepToString(dmCommon.dumpSite().split(" ")).length(), 24);
+    }
 }
