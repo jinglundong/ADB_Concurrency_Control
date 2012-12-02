@@ -119,5 +119,19 @@ public class DataManagerTest {
         assertEquals(dmCommon.getSnapshot().size(), 0);
         assertEquals(dmCommon.getWriteLog().size(), 0);
     }
+    
+    @Test
+    public void testTerminateTransaction(){
+        assertEquals(dmCommon.getWriteLog().size(), 0);
+        assertEquals(dmCommon.getReadLog().size(), 0);
+        dmCommon.write("T1", "x3", "40");
+        assertEquals(dmCommon.getWriteLog().size(), 1);
+        assertEquals(dmCommon.read("T1", "x3", false), "40");
+        assertEquals(dmCommon.getReadLog().size(), 1);
+        dmCommon.terminateTransaction("T1");
+        assertEquals(dmCommon.getWriteLog().size(), 0);
+        assertEquals(dmCommon.getReadLog().size(), 0);      
+        assertEquals(dmCommon.read("T3", "x3", false), "30");
+    }
 
 }

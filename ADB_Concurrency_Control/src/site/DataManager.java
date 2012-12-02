@@ -50,7 +50,7 @@ public class DataManager {
     }
 
     
-    public HashMap<String, Set<String>> getReadLog() {
+    HashMap<String, Set<String>> getReadLog() {
         return readLog;
     }
 
@@ -176,14 +176,7 @@ public class DataManager {
      */
     public Set<String> commit(String transaction){
         this.data.putAll(writeLog.get(transaction));
-        Set<String> result = new HashSet<String>();
-        result.addAll(writeLog.get(transaction).keySet());
-        writeLog.remove(transaction);
-        if (readLog.get(transaction) != null){
-            result.addAll(readLog.get(transaction));
-            readLog.remove(transaction);
-        }        
-        return result;
+        return terminateTransaction(transaction);
     }
     
     
@@ -194,6 +187,25 @@ public class DataManager {
         writeLog = new HashMap<String, HashMap<String, String>>();
         readLog = new HashMap<String, Set<String>>();
         snapshot = new HashMap<String, HashMap<String, String>>(); 
+    }
+    
+    
+    /**
+     * Terminate one given transaction, clear it's write and read log.
+     * @param transaction
+     * @return a set of resource which are accessed by given transaction
+     */
+    public Set<String> terminateTransaction(String transaction){
+        Set<String> result = new HashSet<String>();
+        if (writeLog.containsKey(transaction)){
+            result.addAll(writeLog.get(transaction).keySet());
+            writeLog.remove(transaction);
+        }                
+        if (readLog.containsKey(transaction)){
+            result.addAll(readLog.get(transaction));
+            readLog.remove(transaction);
+        }        
+        return result;
     }
 
 }
