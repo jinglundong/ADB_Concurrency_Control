@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import Entity.Request;
+import Entity.RequestType;
+
 import site.entity.LockType;
-import site.entity.Request;
-import site.entity.RequestType;
 
 
 
@@ -25,45 +26,44 @@ public class ImpSite implements Site{
     
     private int siteNum;
     
+    
+    /**
+     * Constructor of Site
+     * @param siteNum For the test scenario, siteNum is from 1 to 10
+     * @param data data represented by String. No necessary to parse to int.
+     * @param unique a set of resource name which only stored on this site
+     */
     public ImpSite(int siteNum, HashMap<String, String> data, Set<String> unique){      
         this.siteNum = siteNum;
         lockManager = new ImpLockManager();
         dataManager = new ImpDataManager(data, unique);
+        this.isRunning = true;
     }
-    
-    private void initiateData(Map<String, String> data, Set<String> unique){
-//        if (unique == null || data == null){
-//            throw new IllegalArgumentException("arguments can not be null");
-//        }
-//        if (siteNum % 2 != 0){
-//            unique.add("x" + String.valueOf(siteNum-1));            
-//            unique.add("x" + String.valueOf(siteNum - 1 + 10));
-//            data.put("x" + String.valueOf(siteNum-1), String.valueOf(siteNum -1));
-//            data.put("x" + String.valueOf(siteNum-1+10), String.valueOf(siteNum -1+10));
-//        }
-//        for (int i=2; i<=20; i++){
-//            data.put("x" + i, String.valueOf(i*10));
-//        }                
-    }
+   
     
     @Override
-    public Set<String> checkConflict(Request request){  
-        if (request.requestType != RequestType.READ 
-                && request.requestType != RequestType.WRITE){
-            throw new IllegalArgumentException("request type must be either read or write");
-        }
-        if (request.requestType == RequestType.READ){
+    public Set<String> checkConflict(Request request){
+        if (!this.isRunning){
+            throw new RuntimeException("access a down site");
+        }        
+        switch (request.requestType){
+        case READ:
             return lockManager.checkConflict(request.resource, 
-                    request.transaction, LockType.READ);
-        }
-        else{   //Write
+                    request.transaction, LockType.READ);            
+        case WRITE:
             return lockManager.checkConflict(request.resource, 
                     request.transaction, LockType.WRITE);
+        default:
+            throw new IllegalArgumentException("request type must be either read or write");
         }
     }
 
+    
     @Override
     public String exeRequest(Request request) {
+        if (!this.isRunning){
+            throw new RuntimeException("access a down site");
+        }     
         RequestType requestType = request.requestType;
         switch (requestType){
         case READ:
@@ -76,27 +76,73 @@ public class ImpSite implements Site{
                 throw new IllegalArgumentException("value to be written to database is null");
             }
             dataManager.write(request.transaction, request.resource, request.value);
-        case ROREAD:
+            break;
+        case ROREAD:    //read issued by a read only transaction
             lockManager.setLock(request.resource, request.transaction, LockType.READ);
             dataManager.read(request.transaction, request.resource, true);
             break;
         case DUMP:
-            
+            if (request.resource == null || request.resource.isEmpty()){
+                dataManager.dumpSite();
+            }
+            else{
+                dataManager.dumpResource(request.resource);
+            }
+            break;
         case COMMIT:
+            if (request.transaction == null || request.transaction.isEmpty()){
+                throw new IllegalArgumentException("transaction is null");
+            }
+            dataManager.commit(request.transaction);
+            break;
         case ABORT:
+            if (request.transaction == null || request.transaction.isEmpty()){
+                throw new IllegalArgumentException("transaction is null");
+            }
+            dataManager.terminateTransaction(request.transaction);
+            break;
         default:
             throw new IllegalArgumentException("request type not supported");
         }        
         return "SUCCESS";        
     }
 
+    
     @Override
     public void fail() {
+        if (!this.isRunning){
+            throw new RuntimeException("fail a site already down");
+        }     
         this.isRunning = false;    
-        
+        this.lockManager.removeAllLocks();
     }
     
+
+    @Override
     public boolean isRunning(){
         return this.isRunning;
     }
+
+
+    @Override
+    public int getSiteNum() {
+        return siteNum;
+    }
+
+
+    ImpLockManager getLockManager() {
+        return lockManager;
+    }
+
+
+    ImpDataManager getDataManager() {
+        return dataManager;
+    }
+
+
+    @Override
+    public boolean containsResource(String resource) {
+        return dataManager.containsResource(resource);
+    }    
+    
 }

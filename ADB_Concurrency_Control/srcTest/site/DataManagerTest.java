@@ -148,6 +148,6 @@ public class DataManagerTest {
     
     @Test
     public void testDumpSite(){
-        assertEquals(Arrays.deepToString(dmCommon.dumpSite().split(" ")).length(), 24);
+        assertEquals(dmCommon.dumpSite().split(" ").length, 24);
     }
 }

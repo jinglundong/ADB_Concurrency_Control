@@ -58,7 +58,19 @@ interface LockManager {
      *            can be LockType.WRITE or LockType.READ
      */
     void setLock(String resource, String transactionID, LockType requestType);
+    
+    /**
+     * Add recovery Lock too all not Unique resources
+     * @param notUnique the Set of not unique Resources
+     */
+    void recovery(Set<String> notUnique);
 
+    /**
+     * Remove all the locks on the site.
+     * Supposed only be used when site fails.
+     */
+    void removeAllLocks();
+    
     /**
      * Remove The lock on a resource from a certain Transaction. Returns true if
      * at least one lock is removed.

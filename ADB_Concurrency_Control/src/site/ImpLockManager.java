@@ -1,5 +1,6 @@
 package site;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -19,12 +20,17 @@ class ImpLockManager implements LockManager {
      * Contains access History.
      */
     private Map<String, Set<String>> resourcesOfT;
-    
+
+    public ImpLockManager() {
+        this.locksOfR = new HashMap<String, ResourceLock>();
+        this.resourcesOfT = new HashMap<String, Set<String>>();
+    }
+
     @Override
-    public boolean isRecoverying(String resource){        
+    public boolean isRecoverying(String resource) {
         ResourceLock thisLock = locksOfR.get(resource);
-        
-        if(thisLock == null || thisLock.getType()!=LockType.RECOVERY)
+
+        if (thisLock == null || thisLock.getType() != LockType.RECOVERY)
             return false;
         return true;
     }
@@ -43,7 +49,8 @@ class ImpLockManager implements LockManager {
 
         // This resource in under recovery
         if (thisType == LockType.RECOVERY) {
-            System.err.println("["+ resource +"] is under recovery");
+            System.err.println("error: site.ImpLockManager.chechConflict\n  ["
+                    + resource + "] is under recovery");
             return null;
         }
 
@@ -58,13 +65,17 @@ class ImpLockManager implements LockManager {
                 return thisLock.getTransactions();
         }
 
-        if (thisType == LockType.READ && requestType == LockType.WRITE)
+        if (thisType == LockType.READ && requestType == LockType.READ)
             return new HashSet<String>();
 
-        System.err.println("error: when thislock is " + thisLock
-                + "\nComing request is [resource: " + resource
-                + ", transaction: " + transaction + ", Type: " + requestType
-                + "]");
+        System.err
+                .println("error: site.ImpLockManager.chechConflict\n  when thislock is "
+                        + thisLock
+                        + "\nComing request is [Resource: "
+                        + resource
+                        + ", Lock Type: "
+                        + requestType
+                        + ", Transaction: " + transaction + "]");
 
         return null;
     }
@@ -73,16 +84,20 @@ class ImpLockManager implements LockManager {
     public void setLock(String resource, String transaction,
             LockType requestType) {
         if (requestType != LockType.READ && requestType != LockType.WRITE) {
-            System.err.println("error: invalid coming request " + requestType);
+            System.err
+                    .println("error: site.ImpLockManager.setLock\n  invalid coming request "
+                            + requestType);
             return;
         }
 
         ResourceLock thisLock = locksOfR.get(resource);
 
-        // Recovery Lock is handled by LockManager Here
+        // If this resource is under Recovery
         if (thisLock != null && thisLock.getType() == LockType.RECOVERY) {
             if (requestType == LockType.READ)
-                System.err.println("error: When recoverying get read request");
+                System.err
+                        .println("error: site.ImpLockManager.setLock\n  when recoverying get read request, ["
+                                + resource + "] is under recovery");
 
             if (!this.resourcesOfT.containsKey(transaction))
                 this.resourcesOfT.put(transaction, new HashSet<String>());
@@ -105,19 +120,39 @@ class ImpLockManager implements LockManager {
     }
 
     @Override
+    public void recovery(Set<String> notUnique) {
+        this.locksOfR.clear();
+        this.resourcesOfT.clear();
+
+        for (String resource : notUnique) {
+            ResourceLock tempLock = new ResourceLock(resource);
+            tempLock.addLock(resource, null, LockType.RECOVERY);
+            this.locksOfR.put(resource, tempLock);
+        }
+    }
+    
+    @Override
+    public void removeAllLocks() {
+        this.locksOfR.clear();
+        this.resourcesOfT.clear();
+    }
+
+    @Override
     public boolean removeLock(String resource, String transaction) {
         ResourceLock rLock = locksOfR.get(resource);
         Set<String> tResources = this.resourcesOfT.get(transaction);
 
         if (rLock == null) {
-            System.err.println("error: No lock on locksOfR of [" + resource
-                    + "] found");
+            System.err
+                    .println("error: site.ImpLockManager.removeLock\n  No lock on locksOfR of ["
+                            + resource + "] found");
             return false;
         }
 
         if (tResources == null) {
-            System.err.println("error: No resource on resourcesOfT of ["
-                    + tResources + "] found");
+            System.err
+                    .println("error: site.ImpLockManager.removeLock\n  No resource on resourcesOfT of ["
+                            + tResources + "] found");
             return false;
         }
 
@@ -128,7 +163,7 @@ class ImpLockManager implements LockManager {
         thereturn = rLock.removeLock(resource, transaction);
         if (thereturn != tResources.remove(resource)) {
             System.err
-                    .println("error: resourcesOfT and locksOfR record mot match");
+                    .println("error: site.ImpLockManager.removeLock\n  resourcesOfT and locksOfR record mot match");
             return false;
         }
         return thereturn;

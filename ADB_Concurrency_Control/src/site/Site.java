@@ -2,7 +2,8 @@ package site;
 
 import java.util.Set;
 
-import site.entity.Request;
+import Entity.Request;
+
 
 public interface Site {
     /**
@@ -41,4 +42,20 @@ public interface Site {
      * @return return true if site is running
      */
     public boolean isRunning();
+    
+    
+    /**
+     * check if this site contains requested resource
+     * @param resource
+     * @return
+     */
+    public boolean containsResource(String resource);
+    
+    
+    /**
+     * Getter of site number
+     * @return
+     */
+    public int getSiteNum();
+        
 }

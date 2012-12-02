@@ -1,4 +1,4 @@
-package site.entity;
+package Entity;
 
 public enum RequestType {
     READ,
