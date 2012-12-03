@@ -99,7 +99,7 @@ public class MainServer {
                 return true;
             }
             else{
-                throw new IOException("begin need " + length + " arguments");
+                throw new IOException(word + " need " + length + " arguments");
             }
         }
         else{
