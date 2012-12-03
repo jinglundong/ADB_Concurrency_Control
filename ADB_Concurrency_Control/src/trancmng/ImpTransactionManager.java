@@ -184,7 +184,7 @@ public class ImpTransactionManager implements TransactionManager {
 
             if (!site.isRunning())
                 continue;
-            if (site.isRecoverying(request.resource))
+            if (site.isRecovering(request.resource))
                 continue;
 
             site.exeRequest(new Request(request.resource, request.transaction,
@@ -289,7 +289,7 @@ public class ImpTransactionManager implements TransactionManager {
 
             if (!site.isRunning())
                 continue;
-            if (site.isRecoverying(resource))
+            if (site.isRecovering(resource))
                 continue;
 
             // Check if there is conflict
@@ -350,7 +350,7 @@ public class ImpTransactionManager implements TransactionManager {
             if (!site.isRunning())
                 continue;
 
-            if (site.isRecoverying(resource))
+            if (site.isRecovering(resource))
                 continue;
 
             // Check if there is conflict

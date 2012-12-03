@@ -11,5 +11,6 @@ public enum RequestType {
     ABORT,
     BEGIN,
     BEGINRO,
-    END
+    END,
+    SNAPSHOT
 }
