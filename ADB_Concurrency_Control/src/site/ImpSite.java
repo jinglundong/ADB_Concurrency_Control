@@ -147,6 +147,12 @@ public class ImpSite implements Site{
     @Override
     public boolean containsResource(String resource) {
         return dataManager.containsResource(resource);
+    }
+
+
+    @Override
+    public boolean isRecovery(String resource) {
+        return this.getLockManager().isRecoverying(resource);
     }    
     
 }

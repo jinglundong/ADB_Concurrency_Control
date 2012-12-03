@@ -1,6 +1,7 @@
 package mainserver;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -15,16 +16,22 @@ import entity.RequestType;
  *
  */
 public class MainServer {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);        
         String line = "";
         while(true){
-            line = scanner.nextLine();   
+            line = scanner.nextLine();               
             String[] instructions = line.trim().split(";"); 
-            for (String str: instructions){
-                String[] words = str.split("[^\\w|\\s]+");
-                System.out.println(parse(words));                
-            }            
+            try{
+                for (String str: instructions){
+                    String[] words = str.split("[^\\w|\\s]+");
+                    System.out.println(parse(words));                
+                }
+            }
+            catch (IOException e){
+                System.out.println("An unsupport line of instructions, because of:\n "+ 
+                        e + "\ntry again:");                
+            }
         }
     }
     
@@ -66,13 +73,14 @@ public class MainServer {
                     return new Request(RequestType.DUMP, form(words[1]));
                 }                                
             default:
-                throw new IllegalArgumentException("wrong number of arguments");
+                throw new IOException("wrong number of arguments of \"DUMP\"");
             }
         }
         if (validWordLength(words, "end", 2)){            
             return new Request(null, form(words[1]), RequestType.END, null);                                
         }
-        throw new IOException("Instruction is not supported ");
+        throw new IOException("The following instruction is not supported :\n" 
+                + Arrays.deepToString(words) );
     }
     
     

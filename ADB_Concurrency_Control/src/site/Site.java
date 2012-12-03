@@ -58,5 +58,12 @@ public interface Site {
      * @return
      */
     public int getSiteNum();
+    
+    
+    /**
+     * Check if given resource is recovering 
+     * @return return true if it is recovering
+     */
+    public boolean isRecovery(String resource);
         
 }
