@@ -1,7 +1,10 @@
 package mainserver;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 import entity.Request;
 import entity.RequestType;
@@ -99,5 +102,40 @@ public class MainServer {
     
     private static String form(String str){
         return str.trim().toLowerCase();
+    }
+    
+    
+    /**
+     * Generate data for different site depends on the site number.
+     * Even variables are created for each site.
+     * Odd variables created only for site (siteNum + 1) %10
+     * @param siteNum In our test case, 1 <= siteNum <= 10
+     * @return 
+     */
+    static HashMap<String, String> createData(int siteNum){        
+        HashMap<String, String> data = new HashMap<String, String>();
+        for (int i=2; i<=20; i+=2){            
+            data.put("x" + i, String.valueOf(i*10));
+        }
+        if (siteNum % 2 == 0){
+            data.put("x" + (siteNum -1), String.valueOf(10*(siteNum-1)));
+            data.put("x" + (siteNum -1 + 10), String.valueOf(10*(siteNum-1+10)));
+        }
+        return data;
+    }
+    
+    
+    /**
+     * A set of odd variables in given site
+     * @param siteNum
+     * @return  return empty set if it is a odd site
+     */
+    static Set<String> createUnique(int siteNum){
+        Set<String> unique = new HashSet<String>();
+        if (siteNum % 2 == 0){  
+            unique.add("x" + (siteNum -1));
+            unique.add("x" + (siteNum -1 + 10));
+        }
+        return unique;
     }
 }
