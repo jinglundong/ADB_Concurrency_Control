@@ -85,10 +85,10 @@ public class ImpSite implements Site{
             break;
         case DUMP:
             if (request.resource == null || request.resource.isEmpty()){
-                dataManager.dumpSite();
+                result = dataManager.dumpSite();
             }
             else{
-                dataManager.dumpResource(request.resource);
+                result = dataManager.dumpResource(request.resource);
             }
             break;
         case COMMIT:

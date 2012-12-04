@@ -127,9 +127,12 @@ public class ImpTransactionManager implements TransactionManager {
     private void handleWaitingList() {
 
         boolean haveEnd = false;
-        Iterator<Request> it = this.waitingList.iterator();
+        Queue tempQ = this.waitingList;
+        this.waitingList = new LinkedList<Request>();
+        Iterator<Request> it = tempQ.iterator();
         while(it.hasNext()){
             Request request = it.next();
+            this.transInfo.get(request.transaction).status = tranStatus.Running;
             if(this.handleRequest(request)){
                 it.remove();
                 if(request.requestType == RequestType.END)
@@ -142,6 +145,8 @@ public class ImpTransactionManager implements TransactionManager {
     }
 
     private boolean handleRequest(Request request) {
+
+        System.out.println(request + "<<<<<<<<<<<<");
         switch (request.requestType) {
         case BEGIN:
         case BEGINRO:
@@ -228,7 +233,7 @@ public class ImpTransactionManager implements TransactionManager {
         transactionEntity tempT = this.transInfo.get(request.transaction);
         switch (tempT.status) {
         case Running:
-            break;
+            return true;
         case Aborted:
             System.out.println("error: transaction [" + request.transaction
                     + "] have been aborted");
@@ -258,7 +263,7 @@ public class ImpTransactionManager implements TransactionManager {
 
         switch (tempT.status) {
         case Running:
-            break;
+            return true;
         case Aborted:
             System.out.println("error: transaction [" + request.transaction
                     + "] have been aborted");
@@ -448,11 +453,11 @@ public class ImpTransactionManager implements TransactionManager {
             return true;
         }
         if (request.resource == null && request.site != null) {
-            this.siteMap.get(request.site).exeRequest(request);
+            System.out.println(this.siteMap.get(request.site).exeRequest(request));
             return true;
         }
         if (request.resource != null && request.site != null) {
-            this.siteMap.get(request.site).exeRequest(request);
+            System.out.println(this.siteMap.get(request.site).exeRequest(request));
             return true;
         }
         System.out.println("error: Dump request invalid");
@@ -477,9 +482,6 @@ public class ImpTransactionManager implements TransactionManager {
     }
 
     private boolean beginRequest(Request request) {
-
-        if (!this.checkReqeustTransactionExists(request))
-            return false;
 
         transactionEntity tempT = new transactionEntity(request.transaction,
                 request.requestType == RequestType.BEGINRO);

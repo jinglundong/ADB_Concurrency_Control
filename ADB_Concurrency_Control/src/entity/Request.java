@@ -52,15 +52,14 @@ public class Request {
         StringBuffer buffer = new StringBuffer();
         buffer.append("resource: ");
         buffer.append(this.resource);
-        buffer.append("\ntransaction: ");
+        buffer.append(", transaction: ");
         buffer.append(this.transaction);
-        buffer.append("\nrequestType: ");
+        buffer.append(", requestType: ");
         buffer.append(String.valueOf(this.requestType));
-        buffer.append("\nvalue: ");
+        buffer.append(", value: ");
         buffer.append(this.value);
-        buffer.append("\nsite: ");
+        buffer.append(", site: ");
         buffer.append(this.site);
-        buffer.append("\n");
         return buffer.toString();        
     }
 }
