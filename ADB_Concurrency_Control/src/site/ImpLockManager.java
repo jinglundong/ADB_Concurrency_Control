@@ -180,7 +180,7 @@ class ImpLockManager implements LockManager {
 
         boolean thereturn = false;
         for (String resource : thisResources) {
-            thereturn = thereturn || this.removeLock(resource, transaction);
+            thereturn = this.removeLock(resource, transaction) || thereturn;
         }
 
         return thereturn;
@@ -213,7 +213,7 @@ class ImpLockManager implements LockManager {
     public boolean removeLockByTransactions(Set<String> transactions) {
         boolean thereturn = false;
         for (String transaction : transactions)
-            thereturn = thereturn || this.removeLockByTransaction(transaction);
+            thereturn = this.removeLockByTransaction(transaction) || thereturn;
         return thereturn;
     }
 
@@ -221,7 +221,7 @@ class ImpLockManager implements LockManager {
     public boolean removeLockByResources(Set<String> resources) {
         boolean thereturn = false;
         for (String resource : resources)
-            thereturn = thereturn || removeLockByResource(resource);
+            thereturn = removeLockByResource(resource) || thereturn;
         return thereturn;
     }
 

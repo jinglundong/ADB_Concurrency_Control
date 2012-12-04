@@ -45,7 +45,7 @@ public class ImpDataManager {
 
     
     Set<String> getReplicatedResource(){
-        Set<String> result = data.keySet();
+        Set<String> result = new HashSet<String>(data.keySet());
         result.removeAll(unique);
         return result;
     }
@@ -130,6 +130,7 @@ public class ImpDataManager {
             }
             //read from database directly
             if (this.data.get(resource) == null){
+                System.out.println(resource);
                 throw new RuntimeException("no requested resource in this site");
             }
             //Add to read log

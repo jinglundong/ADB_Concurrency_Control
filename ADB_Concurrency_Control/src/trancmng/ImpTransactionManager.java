@@ -145,7 +145,6 @@ public class ImpTransactionManager implements TransactionManager {
     }
 
     private boolean handleRequest(Request request) {
-        System.out.println(request + "<<<<<<<<<<<<");
         switch (request.requestType) {
         case BEGIN:
         case BEGINRO:

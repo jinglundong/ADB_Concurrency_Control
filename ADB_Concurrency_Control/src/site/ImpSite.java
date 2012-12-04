@@ -63,7 +63,8 @@ public class ImpSite implements Site{
     
     @Override
     public String exeRequest(Request request) {
-//        System.out.print("site [" + this.siteNum + "] == ");
+        System.out.print("site [" + this.siteNum + "] == ");
+        System.out.println(request);
         if (!this.isRunning){
             throw new RuntimeException("access a down site");
         }     
