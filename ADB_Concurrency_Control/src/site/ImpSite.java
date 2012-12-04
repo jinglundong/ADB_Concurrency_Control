@@ -100,6 +100,7 @@ public class ImpSite implements Site{
             break;
         case SNAPSHOT:
             dataManager.createSnapshot(request.transaction);
+            break;
         case ABORT:
             if (request.transaction == null || request.transaction.isEmpty()){
                 throw new IllegalArgumentException("transaction is null");
