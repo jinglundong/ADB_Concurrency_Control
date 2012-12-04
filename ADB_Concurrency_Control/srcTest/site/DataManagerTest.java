@@ -62,7 +62,7 @@ public class DataManagerTest {
     @Test
     public void testRead() {
         assertEquals(dmCommon.read("T1", "x3", false), "30");
-        dmCommon.createSnapshot("T2");
+        dmCommon.createSnapshot("T2", null);
         assertEquals(dmCommon.read("T2", "x3", true), "30");
         dmCommon.write("T1", "x3", "40");
         assertEquals(dmCommon.read("T2", "x3", true), "30");
@@ -72,7 +72,7 @@ public class DataManagerTest {
     @Test (expected = RuntimeException.class)
     public void testReadNotExist(){
         dmCommon.read("T1", "x1", false);
-        dmCommon.createSnapshot("T2");
+        dmCommon.createSnapshot("T2", null);
         dmCommon.read("T2", "x1", true);
     }
 
@@ -88,11 +88,11 @@ public class DataManagerTest {
     @Test
     public void testCreateSnapshot() {
         assertEquals(dmCommon.getSnapshot().size(), 0);
-        dmCommon.createSnapshot("T2");
+        dmCommon.createSnapshot("T2", null);
         assertEquals(dmCommon.getSnapshot().size(), 1);
         dmCommon.write("T1", "x3", "40");        
         dmCommon.commit("T1");
-        dmCommon.createSnapshot("T3");
+        dmCommon.createSnapshot("T3",null);
         assertEquals(dmCommon.getSnapshot().size(), 2);
         assertEquals(dmCommon.read("T2", "x3", true), "30");
         assertEquals(dmCommon.read("T3", "x3", true), "40");

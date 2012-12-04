@@ -111,7 +111,7 @@ public class ImpSiteTest {
         String transaction = "T3";
         RequestType requestType = RequestType.ROREAD;
         String value = "";      
-        site.getDataManager().createSnapshot("T3");
+        site.getDataManager().createSnapshot("T3", null);
         Request request = new Request(resource, transaction, requestType, value);
         assertEquals(site.exeRequest(request), "40");
         //dump x4
@@ -167,7 +167,7 @@ public class ImpSiteTest {
         assertTrue(site.checkConflict(request).isEmpty());
         site.exeRequest(request);
         
-        site.getDataManager().createSnapshot("T2");
+        site.getDataManager().createSnapshot("T2", null);
         resource = "x4";
         transaction = "T2";
         requestType = RequestType.ROREAD;

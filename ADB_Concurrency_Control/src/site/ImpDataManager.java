@@ -1,5 +1,6 @@
 package site;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -106,10 +107,9 @@ public class ImpDataManager {
                 throw new IllegalArgumentException(
                         "A read transaction which has no snapshot");
             }
-            if(!snapshot.get(transaction).containsKey(resource)){
-                throw new IllegalArgumentException(
-                        "snapshot doesn't contains resource: " 
-                        + resource + "for transaction: " + transaction);
+          //when creating a snapshot, this resource is recovering
+            if(!snapshot.get(transaction).containsKey(resource)){   
+                return "";
             }
             return snapshot.get(transaction).get(resource);
         }
@@ -164,11 +164,17 @@ public class ImpDataManager {
      * when a new read only transaction is established.
      * @param transaction
      */
-    public void createSnapshot(String transaction){        
+    public void createSnapshot(String transaction, Set<String> recoveringResource){          
         if (snapshot.containsKey(transaction)){
             throw new IllegalArgumentException("snapshot already exist");
         }
-        snapshot.put(transaction, new HashMap<String, String>(data));
+        HashMap<String, String> newSnapshot = new HashMap<String, String>(data);
+        if (recoveringResource != null){
+            for (String res: recoveringResource){
+                newSnapshot.remove(res);
+            }
+        }
+        snapshot.put(transaction, newSnapshot);
     }
     
     
@@ -217,15 +223,34 @@ public class ImpDataManager {
      * Dump all resources on this site
      * @return
      */
-    public String dumpSite(){
-        StringBuffer buffer = new StringBuffer();
+    public String dumpSite(){        
+        //sort the output by resource name
+        int maxResourceId = -1;
+        //find the max resource id
         for (Map.Entry<String, String> entry : data.entrySet()){
+            int resourceId = Integer.parseInt(entry.getKey().substring(1));
+            if (resourceId > maxResourceId){
+                maxResourceId = resourceId;
+            }
+        }
+        String[] array = new String[maxResourceId];        
+        StringBuffer outerBuffer = new StringBuffer();
+        for (Map.Entry<String, String> entry : data.entrySet()){
+            StringBuffer buffer = new StringBuffer();
             buffer.append(entry.getKey());
             buffer.append(": ");
             buffer.append(entry.getValue());
             buffer.append(" ");
+            int resourceId = Integer.parseInt(entry.getKey().substring(1));
+            array[resourceId - 1] = buffer.toString();
+        }      
+        for(int i=0; i<maxResourceId; i++){
+            if (array[i] != null){
+                outerBuffer.append(array[i]);
+            }            
         }
-        return buffer.toString();
+        System.out.println(outerBuffer.toString());
+        return outerBuffer.toString();
     }
     
     

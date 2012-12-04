@@ -20,7 +20,7 @@ public class ImpSite implements Site{
     
     private boolean isRunning;
     
-    private ImpLockManager lockManager;
+    private LockManager lockManager;
     
     private ImpDataManager dataManager;
     
@@ -139,7 +139,7 @@ public class ImpSite implements Site{
     }
 
 
-    ImpLockManager getLockManager() {
+    LockManager getLockManager() {
         return lockManager;
     }
 
@@ -163,7 +163,13 @@ public class ImpSite implements Site{
 
     @Override
     public void createSnapshot(String transaction) {
-        this.getDataManager().createSnapshot(transaction);        
+        Set<String> recoveringResource = new HashSet<String>();
+        for (String str: this.dataManager.getData().keySet()){
+            if (this.lockManager.isRecoverying(str)){
+                recoveringResource.add(str);
+            }
+        }
+        this.getDataManager().createSnapshot(transaction, recoveringResource);        
     }
 
 
