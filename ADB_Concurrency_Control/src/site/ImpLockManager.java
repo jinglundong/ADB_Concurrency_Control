@@ -161,7 +161,7 @@ class ImpLockManager implements LockManager {
 
         boolean thereturn = false;
         thereturn = rLock.removeLock(resource, transaction);
-        if (thereturn != tResources.remove(resource)) {
+        if (!tResources.contains(resource)) {
             System.err
                     .println("error: site.ImpLockManager.removeLock\n  resourcesOfT and locksOfR record mot match");
             return false;

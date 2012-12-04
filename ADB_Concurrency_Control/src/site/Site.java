@@ -64,6 +64,12 @@ public interface Site {
      * Check if given resource is recovering 
      * @return return true if it is recovering
      */
-    public boolean isRecovery(String resource);
+    public boolean isRecovering(String resource);
         
+    
+    /**
+     * create snapshot for read only transaction
+     * @param transaction
+     */
+    public void createSnapshot(String transaction);
 }

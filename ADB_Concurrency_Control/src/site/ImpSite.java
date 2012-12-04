@@ -151,8 +151,16 @@ public class ImpSite implements Site{
 
 
     @Override
-    public boolean isRecovery(String resource) {
+    public boolean isRecovering(String resource) {
         return this.getLockManager().isRecoverying(resource);
+    }
+
+
+    @Override
+    public void createSnapshot(String transaction) {
+        this.getDataManager().createSnapshot(transaction);        
     }    
+    
+    
     
 }
