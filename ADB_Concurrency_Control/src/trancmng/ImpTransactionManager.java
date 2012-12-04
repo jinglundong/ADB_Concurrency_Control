@@ -317,11 +317,11 @@ public class ImpTransactionManager implements TransactionManager {
                     this.abortRequest(new Request(null, request.transaction,
                             RequestType.ABORT, null));
                 }
-                break;
+                return false;
             }
 
             // coming here means no conflict
-            site.exeRequest(request);
+            System.out.println(site.exeRequest(request));
             this.visitingTrans.get(site).add(request.transaction);
             this.transInfo.get(request.transaction).visitedSites.add(site);
             return true;
@@ -509,8 +509,8 @@ public class ImpTransactionManager implements TransactionManager {
             for (Request wait : this.waitingList) {
                 if (wait.transaction.equals(request.transaction))
                     removing.add(wait);
-                this.waitingList.removeAll(removing);
             }
+            this.waitingList.removeAll(removing);
         }
 
         for (Site site : tempT.visitedSites) {
