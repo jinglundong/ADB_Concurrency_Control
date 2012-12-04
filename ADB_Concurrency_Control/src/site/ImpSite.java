@@ -98,6 +98,8 @@ public class ImpSite implements Site{
             lockManager.removeLockByTransaction(request.transaction);
             dataManager.commit(request.transaction);
             break;
+        case SNAPSHOT:
+            dataManager.createSnapshot(request.transaction);
         case ABORT:
             if (request.transaction == null || request.transaction.isEmpty()){
                 throw new IllegalArgumentException("transaction is null");

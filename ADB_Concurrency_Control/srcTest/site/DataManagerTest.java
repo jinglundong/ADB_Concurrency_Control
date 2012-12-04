@@ -150,4 +150,10 @@ public class DataManagerTest {
     public void testDumpSite(){
         assertEquals(dmCommon.dumpSite().split(" ").length, 24);
     }
+    
+    @Test
+    public void testReadNotWrite(){
+        dmCommon.read("T1", "x2", false);
+        dmCommon.commit("T1");
+    }
 }
