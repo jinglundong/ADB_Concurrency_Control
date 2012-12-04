@@ -72,4 +72,6 @@ public interface Site {
      * @param transaction
      */
     public void createSnapshot(String transaction);
+    
+    public void recover();
 }

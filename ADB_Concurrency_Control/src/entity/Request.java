@@ -50,10 +50,10 @@ public class Request {
     @Override
     public String toString(){
         StringBuffer buffer = new StringBuffer();
-        buffer.append("resource: ");
-        buffer.append(this.resource);
-        buffer.append(", transaction: ");
+        buffer.append("transaction: ");
         buffer.append(this.transaction);
+        buffer.append(", resource: ");
+        buffer.append(this.resource);
         buffer.append(", requestType: ");
         buffer.append(String.valueOf(this.requestType));
         buffer.append(", value: ");

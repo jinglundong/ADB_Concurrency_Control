@@ -145,7 +145,6 @@ public class ImpTransactionManager implements TransactionManager {
     }
 
     private boolean handleRequest(Request request) {
-
         System.out.println(request + "<<<<<<<<<<<<");
         switch (request.requestType) {
         case BEGIN:
@@ -158,6 +157,7 @@ public class ImpTransactionManager implements TransactionManager {
                 return false;
             if (this.transInfo.get(request.transaction).isReadOnly())
                 return this.readOnlyRequest(request);
+
             return this.readRequest(request);
         case WRITE:
             if (!checkRequestResourceExists(request))
@@ -186,14 +186,16 @@ public class ImpTransactionManager implements TransactionManager {
 
     private boolean readOnlyRequest(Request request) {
         for (Site site : this.transInfo.get(request.transaction).visitedSites) {
-
+            
+            if(!this.sitesAvaliable.get(request.resource).contains(site))
+                continue;
             if (!site.isRunning())
                 continue;
             if (site.isRecovering(request.resource))
                 continue;
 
-            site.exeRequest(new Request(request.resource, request.transaction,
-                    RequestType.ROREAD, null));
+            System.out.println(site.exeRequest(new Request(request.resource, request.transaction,
+                    RequestType.ROREAD, null)));
             return true;
         }
 
@@ -477,7 +479,7 @@ public class ImpTransactionManager implements TransactionManager {
                 return false;
             }
 
-        this.siteMap.get(request.site).exeRequest(request);
+        this.siteMap.get(request.site).recover();
         return true;
     }
 

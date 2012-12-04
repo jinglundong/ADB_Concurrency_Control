@@ -176,7 +176,8 @@ public class ImpDataManager {
      * @return a set of resources that have been accessed by given transaction (R,W)
      */
     public Set<String> commit(String transaction){
-        this.data.putAll(writeLog.get(transaction));
+        if(writeLog.get(transaction) != null)
+            this.data.putAll(writeLog.get(transaction));
         return terminateTransaction(transaction);
     }
     

@@ -63,6 +63,7 @@ public class ImpSite implements Site{
     
     @Override
     public String exeRequest(Request request) {
+//        System.out.print("site [" + this.siteNum + "] == ");
         if (!this.isRunning){
             throw new RuntimeException("access a down site");
         }     
@@ -162,5 +163,12 @@ public class ImpSite implements Site{
     @Override
     public void createSnapshot(String transaction) {
         this.getDataManager().createSnapshot(transaction);        
+    }
+
+
+    @Override
+    public void recover() {
+        this.lockManager.recovery(this.dataManager.getReplicatedResource());
+        this.isRunning = true;
     }
 }
