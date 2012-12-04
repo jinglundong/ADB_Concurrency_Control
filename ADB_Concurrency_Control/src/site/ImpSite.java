@@ -105,6 +105,9 @@ public class ImpSite implements Site{
             lockManager.removeLockByTransaction(request.transaction);
             dataManager.terminateTransaction(request.transaction);
             break;
+        case SNAPSHOT:
+            this.createSnapshot(request.transaction);
+            break;
         default:
             throw new IllegalArgumentException("request type not supported");
         }        
